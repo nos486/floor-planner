@@ -2,7 +2,7 @@
 
 A lightweight, modern 2D floor-plan design web application built with pure HTML/CSS/JavaScript and SVG. It runs 100% in the browser with no backend or database required, and calculates live enclosed room areas ($m^2$) as you draw walls, doors, and windows.
 
-![FloorPlanner Preview](public/favicon.svg)
+![FloorPlanner Screenshot](docs/screenshot.png)
 
 ---
 
