@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Simple, modern 2D floor-plan sketcher with live room detection, square meter area calculation, walls, doors, windows, and scale configuration.">
+  <title>FloorPlanner 2D — Architecture & Room Area Designer</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <link rel="stylesheet" href="/src/styles/canvas.css">
+  <link rel="stylesheet" href="/src/styles/ui.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header Navigation -->
+    <header class="app-header">
+      <div class="brand-row">
+        <div class="brand-icon" title="FloorPlanner 2D">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <path d="M3 10h18M10 21V10"/>
+            <path d="M10 14h11"/>
+          </svg>
+        </div>
+        <h1 class="brand-title">FloorPlanner</h1>
+      </div>
+
+      <div class="nav-actions">
+        <button class="btn-nav" id="btn-new-project" title="Start a fresh plan">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>New</span>
+        </button>
+
+        <button class="btn-nav" id="btn-load-project" title="Load project from JSON">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          <span>Load</span>
+        </button>
+
+        <button class="btn-nav" id="btn-save-project" title="Export project to JSON file">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          <span>Save</span>
+        </button>
+
+        <button class="btn-nav" id="btn-export-svg" title="Export current floor plan as an SVG file">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>SVG</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Workspace -->
+    <main class="workspace-layout">
+      <!-- Interactive SVG Canvas Container -->
+      <div id="canvas-container" class="canvas-container"></div>
+
+      <!-- Floating Toolbar -->
+      <div id="toolbar-container" class="toolbar-container"></div>
+
+      <!-- Selected Element Inspector -->
+      <div id="inspector-container" class="inspector-container hidden"></div>
+
+      <!-- Right Overview Sidebar -->
+      <aside id="sidebar-container" class="sidebar-container"></aside>
+    </main>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+.floor-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.canvas-bg {
+  fill: transparent;
+}
+
+/* Walls */
+.wall-segment {
+  stroke: #e2e8f0;
+  stroke-linecap: square;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: stroke 0.15s ease, filter 0.15s ease;
+}
+
+.wall-segment:hover {
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.4));
+}
+
+.wall-segment.selected {
+  stroke: #38bdf8;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+}
+
+.wall-joint {
+  fill: #e2e8f0;
+  stroke: none;
+}
+
+.wall-joint.selected {
+  fill: #38bdf8;
+}
+
+/* Rooms */
+.room-group {
+  cursor: pointer;
+}
+
+.room-polygon {
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.room-polygon:hover {
+  fill: rgba(56, 189, 248, 0.16);
+  stroke: #38bdf8;
+}
+
+.room-badge {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.room-title {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  fill: #f1f5f9;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.room-area {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  fill: #38bdf8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Openings: Doors & Windows */
+.door-opening-cut,
+.window-opening-cut {
+  stroke: #111620; /* Matches background color to punch hole in wall */
+  stroke-linecap: butt;
+}
+
+.door-leaf {
+  stroke: #38bdf8;
+  stroke-width: 2.5px;
+  stroke-linecap: round;
+}
+
+.door-arc {
+  fill: none;
+  stroke: rgba(56, 189, 248, 0.65);
+  stroke-width: 1.5px;
+  stroke-dasharray: 4 3;
+}
+
+.door-group {
+  cursor: pointer;
+}
+
+.door-group:hover .door-leaf {
+  stroke: #ffffff;
+}
+
+.door-group.selected .door-leaf {
+  stroke: #f43f5e;
+}
+
+.door-group.selected .door-arc {
+  stroke: #f43f5e;
+}
+
+.window-glass-line {
+  stroke: #38bdf8;
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+}
+
+.window-group {
+  cursor: pointer;
+}
+
+.window-group:hover .window-glass-line {
+  stroke: #ffffff;
+}
+
+.window-group.selected .window-glass-line {
+  stroke: #f43f5e;
+}
+
+/* Dimensions */
+.dimension-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  fill: #94a3b8;
+  user-select: none;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+.dimension-badge text {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  fill: #ffffff;
+  paint-order: stroke;
+  stroke: #0c0f14;
+  stroke-width: 4px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Previews */
+.preview-cursor {
+  fill: #38bdf8;
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+  pointer-events: none;
+}
+
+.preview-wall {
+  stroke: rgba(56, 189, 248, 0.7);
+  stroke-dasharray: 6 4;
+  stroke-linecap: square;
+  pointer-events: none;
+}
+
+/* Snapping Indicators */
+.snap-endpoint-circle {
+  fill: #10b981;
+  stroke: #ffffff;
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.8));
+  pointer-events: none;
+}
+
+.snap-grid-box {
+  fill: none;
+  stroke: #38bdf8;
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.8));
+  pointer-events: none;
+}
+
+.snap-guide-line {
+  stroke: rgba(56, 189, 248, 0.35);
+  stroke-width: 1px;
+  stroke-dasharray: 5 4;
+  pointer-events: none;
+}
+
+.selection-handle {
+  fill: #38bdf8;
+  stroke: #ffffff;
+  stroke-width: 2px;
+  cursor: grab;
+  filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.5));
+}
+
+.selection-handle:hover {
+  transform: scale(1.2);
+  fill: #ffffff;
+}
