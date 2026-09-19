@@ -129,15 +129,20 @@ Floor plan files are exported as human-readable JSON files conforming to this sc
 
 ---
 
-## Keyboard Shortcuts
+## Keyboard Shortcuts & Gestures
 
-| Key | Action |
+| Key / Gesture | Action |
 | --- | --- |
-| `1` or `S` | Select & Move Tool |
+| **Two-Finger Trackpad Scroll** | Smooth 2D Pan across canvas (Native Mac gesture) |
+| **Trackpad Pinch** / `Cmd` + Wheel | Smooth Pinch-to-Zoom centered on cursor |
+| `H` or `P` | Hand / Pan Tool (Click & drag to pan) |
+| `1` or `V` | Select & Move Tool |
 | `2` or `W` | Wall Tool |
 | `3` or `D` | Door Tool |
 | `4` or `I` | Window Tool |
-| `Space` + Drag | Pan Canvas |
+| `+` / `-` | Zoom In / Zoom Out |
+| `0` | Fit Plan to Screen |
+| `Space` + Drag / Right-Click Drag | Pan Canvas |
 | `Space` or `F` | Flip Door Swing Direction (while placing or editing) |
 | `Ctrl+Z` / `Cmd+Z` | Undo |
 | `Ctrl+Y` / `Cmd+Shift+Z` | Redo |

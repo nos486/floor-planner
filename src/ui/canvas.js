@@ -4,6 +4,7 @@ import { WallTool } from './tools/wallTool.js';
 import { DoorTool } from './tools/doorTool.js';
 import { WindowTool } from './tools/windowTool.js';
 import { SelectTool } from './tools/selectTool.js';
+import { PanTool } from './tools/panTool.js';
 
 export class Canvas {
   constructor(containerEl, state) {
@@ -98,6 +99,7 @@ export class Canvas {
   initTools() {
     this.tools = {
       select: new SelectTool(this),
+      pan: new PanTool(this),
       wall: new WallTool(this),
       door: new DoorTool(this),
       window: new WindowTool(this)
@@ -158,12 +160,43 @@ export class Canvas {
     this.gridLayer.appendChild(gridRect);
   }
 
+  zoomAtPoint(clientX, clientY, zoomMultiplier) {
+    const rect = this.svg.getBoundingClientRect();
+    const mouseScreenX = clientX - rect.left;
+    const mouseScreenY = clientY - rect.top;
+
+    const currentZoom = this.state.ui.zoom;
+    const newZoom = Math.max(0.1, Math.min(6.0, currentZoom * zoomMultiplier));
+
+    // World position under cursor before zoom
+    const worldX = (mouseScreenX - this.state.ui.pan.x) / currentZoom;
+    const worldY = (mouseScreenY - this.state.ui.pan.y) / currentZoom;
+
+    // Adjust pan to keep cursor position fixed in world coordinates
+    this.state.ui.pan.x = mouseScreenX - worldX * newZoom;
+    this.state.ui.pan.y = mouseScreenY - worldY * newZoom;
+    this.state.ui.zoom = newZoom;
+
+    this.applyTransform();
+    this.state.notify('view_change');
+  }
+
   bindEvents() {
     window.addEventListener('resize', () => this.applyTransform());
 
+    // Disable default context menu so right-click drag pans smoothly
+    this.svg.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
     this.svg.addEventListener('mousedown', (e) => {
-      // Middle click or Space+Left click = Pan
-      if (e.button === 1 || (e.button === 0 && this.spacePressed)) {
+      // Middle click (1), Right click (2), Space+Left click (0), or Pan Tool = Pan
+      if (
+        e.button === 1 ||
+        e.button === 2 ||
+        (e.button === 0 && this.spacePressed) ||
+        (e.button === 0 && this.state.ui.activeTool === 'pan')
+      ) {
         e.preventDefault();
         this.isPanning = true;
         this.panStart = { x: e.clientX, y: e.clientY };
@@ -185,6 +218,7 @@ export class Canvas {
         this.state.ui.pan.x += dx;
         this.state.ui.pan.y += dy;
         this.applyTransform();
+        this.state.notify('view_change');
         return;
       }
 
@@ -199,7 +233,8 @@ export class Canvas {
     window.addEventListener('mouseup', (e) => {
       if (this.isPanning) {
         this.isPanning = false;
-        this.svg.style.cursor = this.spacePressed ? 'grab' : '';
+        this.svg.style.cursor = (this.spacePressed || this.state.ui.activeTool === 'pan') ? 'grab' : '';
+        this.state.notify('view_change');
         return;
       }
 
@@ -210,7 +245,7 @@ export class Canvas {
     });
 
     this.svg.addEventListener('click', (e) => {
-      if (this.spacePressed) return;
+      if (this.spacePressed || this.isPanning || this.state.ui.activeTool === 'pan') return;
       const worldPos = this.screenToWorld(e.clientX, e.clientY);
       if (this.activeToolInstance?.onClick) {
         this.activeToolInstance.onClick(e, worldPos);
@@ -223,28 +258,23 @@ export class Canvas {
       }
     });
 
-    // Zoom on wheel (centered at mouse)
+    // High-performance trackpad & mouse wheel handling (macOS optimized)
     this.svg.addEventListener('wheel', (e) => {
       e.preventDefault();
 
-      const rect = this.svg.getBoundingClientRect();
-      const mouseScreenX = e.clientX - rect.left;
-      const mouseScreenY = e.clientY - rect.top;
-
-      // Current world position under cursor
-      const worldX = (mouseScreenX - this.state.ui.pan.x) / this.state.ui.zoom;
-      const worldY = (mouseScreenY - this.state.ui.pan.y) / this.state.ui.zoom;
-
-      const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
-      const newZoom = Math.max(0.15, Math.min(5.0, this.state.ui.zoom * zoomFactor));
-
-      // Adjust pan to keep cursor position fixed in world coordinates
-      this.state.ui.pan.x = mouseScreenX - worldX * newZoom;
-      this.state.ui.pan.y = mouseScreenY - worldY * newZoom;
-      this.state.ui.zoom = newZoom;
-
-      this.applyTransform();
-      this.state.notify('view_change');
+      if (e.ctrlKey || e.metaKey) {
+        // Trackpad pinch-to-zoom OR Cmd/Ctrl + Scroll wheel
+        // macOS trackpad pinch sends small continuous fractional deltaY with ctrlKey=true
+        const factor = Math.exp(-e.deltaY * 0.008);
+        this.zoomAtPoint(e.clientX, e.clientY, factor);
+      } else {
+        // Standard two-finger trackpad swipe or mouse scroll = PAN
+        // Natural 1:1 pan response
+        this.state.ui.pan.x -= e.deltaX;
+        this.state.ui.pan.y -= e.deltaY;
+        this.applyTransform();
+        this.state.notify('view_change');
+      }
     }, { passive: false });
 
     // Keyboard events
@@ -272,11 +302,23 @@ export class Canvas {
         return;
       }
 
-      // Tool hotkeys: 1=Select, 2=Wall, 3=Door, 4=Window
-      if (e.key === '1' || e.key.toLowerCase() === 's') this.setTool('select');
+      // Tool hotkeys: 1/V=Select, H/P=Pan, 2/W=Wall, 3/D=Door, 4/I=Window
+      if (e.key === '1' || e.key.toLowerCase() === 'v') this.setTool('select');
+      else if (e.key.toLowerCase() === 'h' || e.key.toLowerCase() === 'p') this.setTool('pan');
       else if (e.key === '2' || e.key.toLowerCase() === 'w') this.setTool('wall');
       else if (e.key === '3' || e.key.toLowerCase() === 'd') this.setTool('door');
       else if (e.key === '4' || e.key.toLowerCase() === 'i') this.setTool('window');
+
+      // Zoom hotkeys: '+' or '=' zoom in, '-' zoom out, '0' fit
+      if (e.key === '+' || e.key === '=') {
+        const rect = this.svg.getBoundingClientRect();
+        this.zoomAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2, 1.25);
+      } else if (e.key === '-' || e.key === '_') {
+        const rect = this.svg.getBoundingClientRect();
+        this.zoomAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2, 0.8);
+      } else if (e.key === '0') {
+        this.centerView();
+      }
 
       if (this.activeToolInstance?.onKeyDown) {
         this.activeToolInstance.onKeyDown(e);

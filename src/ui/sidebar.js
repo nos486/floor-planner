@@ -60,7 +60,8 @@ export class Sidebar {
           <span id="sidebar-scale-text">1 grid = 20 cm</span>
         </div>
         <div class="shortcuts-hint">
-          <span>Shortcuts: <strong>1</strong> Select, <strong>2</strong> Wall, <strong>3</strong> Door, <strong>4</strong> Window, <strong>Del</strong> Remove</span>
+          <span>Shortcuts: <strong>1</strong> Select, <strong>H</strong> Pan, <strong>2</strong> Wall, <strong>3</strong> Door, <strong>4</strong> Window, <strong>Del</strong> Remove</span><br>
+          <span>MacBook: <strong>2-Finger Swipe</strong> to Pan, <strong>Pinch</strong> to Zoom</span>
         </div>
       </div>
     `;
