@@ -260,6 +260,78 @@ export class AppState {
     this.notify('wall_delete');
   }
 
+  splitWall(wallId, splitPoint = null) {
+    const wallIdx = this.project.walls.findIndex(w => w.id === wallId);
+    if (wallIdx === -1) return null;
+
+    const wall = this.project.walls[wallIdx];
+    const p1 = wall.points[0];
+    const p2 = wall.points[1];
+
+    let mid;
+    if (splitPoint) {
+      mid = [Math.round(splitPoint[0] * 10) / 10, Math.round(splitPoint[1] * 10) / 10];
+    } else {
+      mid = [
+        Math.round(((p1[0] + p2[0]) / 2) * 10) / 10,
+        Math.round(((p1[1] + p2[1]) / 2) * 10) / 10
+      ];
+    }
+
+    const d1 = dist(p1, mid);
+    const d2 = dist(mid, p2);
+    if (d1 < 10 || d2 < 10) return null; // Too close to endpoints
+
+    this.saveHistorySnapshot();
+
+    // Create two new wall segments sharing the midpoint joint
+    const wallA = {
+      id: generateId('w'),
+      points: [[...p1], [...mid]],
+      thickness: wall.thickness
+    };
+    const wallB = {
+      id: generateId('w'),
+      points: [[...mid], [...p2]],
+      thickness: wall.thickness
+    };
+
+    // Replace original wall with the two new segments
+    this.project.walls.splice(wallIdx, 1, wallA, wallB);
+
+    // Reassign existing doors along this wall
+    for (const door of this.project.doors) {
+      if (door.wallId === wallId) {
+        if (door.offset <= d1) {
+          door.wallId = wallA.id;
+        } else {
+          door.wallId = wallB.id;
+          door.offset = Math.round((door.offset - d1) * 10) / 10;
+        }
+      }
+    }
+
+    // Reassign existing windows along this wall
+    for (const win of this.project.windows) {
+      if (win.wallId === wallId) {
+        if (win.offset <= d1) {
+          win.wallId = wallA.id;
+        } else {
+          win.wallId = wallB.id;
+          win.offset = Math.round((win.offset - d1) * 10) / 10;
+        }
+      }
+    }
+
+    // Select the first new wall segment
+    this.ui.selected = { type: 'wall', id: wallA.id };
+
+    this.recalculateRooms(false);
+    this.notify('wall_split');
+
+    return { wallA, wallB, jointPoint: mid };
+  }
+
   // --- Openings (Doors & Windows) ---
 
   addDoor(wallId, offset, width = this.ui.doorDefaultWidth, flipped = false) {

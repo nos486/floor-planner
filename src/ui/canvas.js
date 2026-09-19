@@ -699,6 +699,42 @@ export class Canvas {
         handle.setAttribute('class', 'selection-handle');
         this.selectionLayer.appendChild(handle);
       }
+
+      // Render center joint midpoint handle to split wall
+      const mid = [
+        (wall.points[0][0] + wall.points[1][0]) / 2,
+        (wall.points[0][1] + wall.points[1][1]) / 2
+      ];
+
+      const midGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      midGroup.setAttribute('class', 'selection-midpoint-group');
+      midGroup.setAttribute('transform', `translate(${mid[0]}, ${mid[1]})`);
+
+      const midCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      midCircle.setAttribute('cx', '0');
+      midCircle.setAttribute('cy', '0');
+      midCircle.setAttribute('r', 6 / this.state.ui.zoom);
+      midCircle.setAttribute('class', 'selection-midpoint-handle');
+      midGroup.appendChild(midCircle);
+
+      const r = 2.8 / this.state.ui.zoom;
+      const hLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      hLine.setAttribute('x1', -r);
+      hLine.setAttribute('y1', 0);
+      hLine.setAttribute('x2', r);
+      hLine.setAttribute('y2', 0);
+      hLine.setAttribute('class', 'selection-midpoint-plus');
+      midGroup.appendChild(hLine);
+
+      const vLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      vLine.setAttribute('x1', 0);
+      vLine.setAttribute('y1', -r);
+      vLine.setAttribute('x2', 0);
+      vLine.setAttribute('y2', r);
+      vLine.setAttribute('class', 'selection-midpoint-plus');
+      midGroup.appendChild(vLine);
+
+      this.selectionLayer.appendChild(midGroup);
     }
   }
 

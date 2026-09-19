@@ -66,6 +66,16 @@ export class Inspector {
           </div>
           <input type="range" id="wall-thickness-slider" min="10" max="50" step="1" value="${wall.thickness}" class="prop-slider">
           <div class="inspector-actions">
+            <button class="btn-secondary" id="wall-split-btn" title="Add a joint in the center of this wall to split it into two">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/>
+                <line x1="12" y1="3" x2="12" y2="9"/>
+                <line x1="12" y1="15" x2="12" y2="21"/>
+                <line x1="3" y1="12" x2="9" y2="12"/>
+                <line x1="15" y1="12" x2="21" y2="12"/>
+              </svg>
+              <span>Add Joint in Center (Split)</span>
+            </button>
             <button class="btn-danger-outline" id="inspector-delete">Delete Wall</button>
           </div>
         </div>
@@ -90,6 +100,10 @@ export class Inspector {
       const val = Number(e.target.value);
       numInput.value = val;
       this.state.updateWallThickness(wall.id, val);
+    });
+
+    this.container.querySelector('#wall-split-btn').addEventListener('click', () => {
+      this.state.splitWall(wall.id);
     });
 
     this.container.querySelector('#inspector-delete').addEventListener('click', () => {

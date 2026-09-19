@@ -32,6 +32,24 @@ export class SelectTool {
       this.dragTarget = hit;
       this.dragStartMouse = [...worldPos];
 
+      if (hit.mode === 'midpoint') {
+        const splitRes = this.state.splitWall(hit.id, hit.midPoint);
+        if (splitRes) {
+          const movingPt = splitRes.jointPoint;
+          this.dragMode = 'vertex';
+          this.dragTarget = { type: 'wall', id: splitRes.wallA.id, mode: 'vertex', vertexIndex: 1 };
+          this.dragStartMouse = [...worldPos];
+          this.initialConnectedWalls = this.state.project.walls.filter(w =>
+            pointsEqual(w.points[0], movingPt, 1) || pointsEqual(w.points[1], movingPt, 1)
+          ).map(w => ({
+            wall: w,
+            isStart: pointsEqual(w.points[0], movingPt, 1),
+            isEnd: pointsEqual(w.points[1], movingPt, 1)
+          }));
+        }
+        return;
+      }
+
       if (hit.mode === 'vertex') {
         const wall = this.state.project.walls.find(w => w.id === hit.id);
         const movingPt = wall.points[hit.vertexIndex];
@@ -163,8 +181,34 @@ export class SelectTool {
     }
   }
 
+  onDblClick(e) {
+    const worldPos = this.canvas.screenToWorld(e.clientX, e.clientY);
+    const hit = this.hitTest(worldPos);
+    if (hit && hit.type === 'wall' && hit.mode === 'wall') {
+      const wall = this.state.project.walls.find(w => w.id === hit.id);
+      if (wall) {
+        const proj = projectPointOnSegment(worldPos, wall.points[0], wall.points[1]);
+        this.state.splitWall(wall.id, proj.point);
+      }
+    }
+  }
+
   hitTest(worldPos) {
     const threshold = 16 / this.state.ui.zoom;
+
+    // 0. Check midpoint handle of currently selected wall first
+    if (this.state.ui.selected?.type === 'wall') {
+      const selWall = this.state.project.walls.find(w => w.id === this.state.ui.selected.id);
+      if (selWall) {
+        const mid = [
+          (selWall.points[0][0] + selWall.points[1][0]) / 2,
+          (selWall.points[0][1] + selWall.points[1][1]) / 2
+        ];
+        if (dist(worldPos, mid) <= threshold + 6) {
+          return { type: 'wall', id: selWall.id, mode: 'midpoint', midPoint: mid };
+        }
+      }
+    }
 
     // 1. Check endpoints of selected or any walls
     for (const wall of this.state.project.walls) {
