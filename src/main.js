@@ -70,6 +70,33 @@ function initApp() {
     exportCurrentSVG(canvas.svg, state.project.projectName);
     showToast('SVG exported!');
   });
+
+  setupMobileBlocker();
+}
+
+function setupMobileBlocker() {
+  const btnCopy = document.getElementById('btn-copy-link');
+  const copyText = document.getElementById('copy-link-text');
+  const mobileBlocker = document.getElementById('mobile-blocker');
+
+  const isMobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  if (isMobileUA && window.innerWidth <= 1024) {
+    if (mobileBlocker) mobileBlocker.style.display = 'flex';
+  }
+
+  if (btnCopy && copyText) {
+    btnCopy.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        copyText.textContent = '✓ Link Copied to Clipboard!';
+        setTimeout(() => {
+          copyText.textContent = 'Copy Link for PC';
+        }, 2500);
+      } catch (err) {
+        prompt('Copy link to open on your PC:', window.location.href);
+      }
+    });
+  }
 }
 
 if (document.readyState === 'loading') {
